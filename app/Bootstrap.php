@@ -60,7 +60,7 @@ class Bootstrap
 	*/
 	public function removeRequiredBilling($fields)
 	{
-		if ( !is_checkout() ) return $address_fields;
+		if ( !is_checkout() ) return $fields;
 		$payment_method = WC()->session->get('chosen_payment_method');
 		if ( $payment_method !== 'invoice' ) return $fields;
 		foreach ( $fields as $name => $field ){

@@ -69,12 +69,7 @@ WooInvoicePayment.Checkout = function()
 				nonce: woocommerce_invoice_payment.nonce,
 				payment_method: payment_method,
 			},
-			beforeSend: function(a,b){
-				console.log(a);
-				console.log(b);
-			},
 			success: function(d){
-				console.log(d);
 				var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
 				self.toggleBillingFields(d.data.hide_billing);
 			},
