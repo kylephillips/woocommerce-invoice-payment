@@ -14,8 +14,16 @@ WooInvoicePaymentAdmin.Factory = function()
 
 	self.build = function()
 	{
-		
+		self.initializeSelectWoo();
 	};
+
+	self.initializeSelectWoo = function()
+	{
+		if ( $('.invoice-payment-select-woo').length < 1 ) return;
+		$('.invoice-payment-select-woo').select2({
+			multiple: true
+		});
+	}
 
 	return self.build();
 }

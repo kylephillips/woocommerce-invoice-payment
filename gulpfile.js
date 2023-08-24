@@ -22,6 +22,7 @@ var js_source_admin = [
 	'assets/js/admin/factory.js'
 ];
 var js_source_public = [
+	'assets/js/public/checkout.js',
 	'assets/js/public/factory.js'
 ];
 var js_compiled = 'assets/js/';

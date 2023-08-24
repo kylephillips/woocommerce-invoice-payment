@@ -1,10 +1,18 @@
 <?php 
 namespace WooInvoicePayment\Activation;
 
+use WooInvoicePayment\Repositories\UserRepository;
+use WooInvoicePayment\Repositories\SettingsRepository;
+
 class Dependencies 
 {
+	private $user_repo;
+	private $settings;
+
 	public function __construct()
 	{
+		$this->user_repo = new UserRepository;
+		$this->settings = new SettingsRepository;
 		add_action( 'wp_enqueue_scripts', [$this, 'scripts']);
 		add_action( 'wp_enqueue_scripts', [$this, 'styles']);
 		add_action( 'admin_enqueue_scripts', [$this, 'adminScripts']);
@@ -24,7 +32,10 @@ class Dependencies
 			true
 		);
 		$localized_data = [
+			'ajaxurl' => admin_url( 'admin-ajax.php' ),
+			'nonce' => wp_create_nonce('woocommerce_invoice_payment')
 		];
+		$localized_data['hide_checkout_billing'] = ( $this->user_repo->customerAllowed() && $this->settings->hideBillingInCheckout() && WC()->session->get('chosen_payment_method') == 'invoice' ) ? true : false;
 		wp_localize_script(
 			'woocommerce-invoice-payment',
 			'woocommerce_invoice_payment',
@@ -43,6 +54,10 @@ class Dependencies
 			[],
 			WOOINVOICEPAYMENT_VERSION
 		);
+		// var_dump(WC()->session->get('chosen_payment_method'));
+		if ( $this->user_repo->customerAllowed() && $this->settings->hideBillingInCheckout() && WC()->session->get('chosen_payment_method') == 'invoice' ) :
+			echo '<style>.woocommerce-checkout .woocommerce-billing-fields {display:none; !important}</style>';
+		endif;
 	}
 
 	/**

@@ -14,7 +14,7 @@ WooInvoicePayment.Factory = function()
 
 	self.build = function()
 	{
-		
+		new WooInvoicePayment.Checkout
 	}
 
 	return self.build();
