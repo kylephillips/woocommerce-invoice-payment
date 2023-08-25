@@ -4,23 +4,35 @@ namespace WooInvoicePayment\Activation;
 use WooInvoicePayment\Repositories\UserRepository;
 use WooInvoicePayment\Repositories\SettingsRepository;
 
+/**
+* Load our front-end dependencies and localize
+*/
 class Dependencies 
 {
+	/**
+	* User Repository
+	* @var obj UserRepository
+	*/ 
 	private $user_repo;
+
+	/**
+	* Setting Repository
+	* @var obj SettingsRepository
+	*/ 
 	private $settings;
 
 	public function __construct()
 	{
 		$this->user_repo = new UserRepository;
 		$this->settings = new SettingsRepository;
-		add_action( 'wp_enqueue_scripts', [$this, 'scripts']);
-		add_action( 'wp_enqueue_scripts', [$this, 'styles']);
-		add_action( 'admin_enqueue_scripts', [$this, 'adminScripts']);
-		add_action( 'admin_enqueue_scripts', [$this, 'adminStyles']);
+		add_action('wp_enqueue_scripts', [$this, 'scripts']);
+		add_action('wp_enqueue_scripts', [$this, 'styles']);
+		add_action('admin_enqueue_scripts', [$this, 'adminScripts']);
+		add_action('admin_enqueue_scripts', [$this, 'adminStyles']);
 	}
 
 	/**
-	* Public Scripts
+	* Enqueue and Localize Public Scripts
 	*/
 	public function scripts()
 	{
@@ -44,7 +56,7 @@ class Dependencies
 	}
 
 	/**
-	* Public Styles
+	* Enqueue Public Styles
 	*/
 	public function styles()
 	{
@@ -54,14 +66,13 @@ class Dependencies
 			[],
 			WOOINVOICEPAYMENT_VERSION
 		);
-		// var_dump(WC()->session->get('chosen_payment_method'));
 		if ( $this->user_repo->customerAllowed() && $this->settings->hideBillingInCheckout() && WC()->session->get('chosen_payment_method') == 'invoice' ) :
 			echo '<style>.woocommerce-checkout .woocommerce-billing-fields {display:none; !important}</style>';
 		endif;
 	}
 
 	/**
-	* Admin Scripts
+	* Enqueue and Localize Admin Scripts
 	*/
 	public function adminScripts()
 	{
@@ -82,7 +93,7 @@ class Dependencies
 	}
 
 	/**
-	* Admin Styles
+	* Enqueue Admin Styles
 	*/
 	public function adminStyles()
 	{
