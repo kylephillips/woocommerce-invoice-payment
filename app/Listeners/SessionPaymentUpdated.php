@@ -3,6 +3,7 @@ namespace WooInvoicePayment\Listeners;
 
 use WooInvoicePayment\Repositories\UserRepository;
 use WooInvoicePayment\Repositories\SettingsRepository;
+use WooInvoicePayment\PaymentMethod\FieldsRequired;
 
 /**
 * Sets the session payment method (via ajax)
@@ -19,11 +20,13 @@ class SessionPaymentUpdated
 {
 	private $user_repo; 
 	private $settings; 
+	private $fields_required;
 
 	public function __construct()
 	{
 		$this->user_repo = new UserRepository;
 		$this->settings = new SettingsRepository;
+		$this->fields_required = new FieldsRequired;
 		$this->validate();
 		$this->savePaymentMethod();
 	}
@@ -47,8 +50,13 @@ class SessionPaymentUpdated
 	private function savePaymentMethod()
 	{
 		$payment_method = sanitize_text_field($_POST['payment_method']);
+		$old_payment_method = WC()->session->get('chosen_payment_method');
+		$billing_fields = $this->fields_required->getBillingFields();
 		WC()->session->set('chosen_payment_method', $payment_method);
 		$data['hide_billing'] = ( $this->user_repo->customerAllowed() && $this->settings->hideBillingInCheckout() && $payment_method == 'invoice' ) ? true : false;
+		$data['old_payment_method'] = $old_payment_method;
+		$data['new_payment_method'] = $payment_method;
+		$data['billing_fields'] = $billing_fields;
 		$this->respond('success', sprintf('Session payment method updated to: %s', $payment_method), $data);
 	}
 

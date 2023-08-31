@@ -55,6 +55,7 @@ WooInvoicePayment.Checkout = function()
 	/**
 	* Update the session payment method on change
 	* This updates the required/validation for the selected payment method
+	* The response includes the billing fields, since we do not require them for invoicing
 	*/
 	self.updateSessionPaymentMethod = function()
 	{
@@ -71,12 +72,27 @@ WooInvoicePayment.Checkout = function()
 			},
 			success: function(d){
 				var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
+				var billing_fields = ( d.data.new_payment_method === 'invoice' ) ? '' : d.data.billing_fields;
+				self.populateBillingFields(d.data.billing_fields);
 				self.toggleBillingFields(d.data.hide_billing);
+				setTimeout(function(){
+					$(document.body).trigger('country_to_state_changed'); // Reset SelectWoo
+				}, 50);
 			},
 			error: function(d){
 				console.log(d);
 			}
 		});
+	}
+
+	/**
+	* Populate billing fields if not set 
+	* (If invoice method is chosen on page load, and another method that requires
+	* billing fields is chosen after page load, the fields are not shown)
+	*/
+	self.populateBillingFields = function(fields_html)
+	{
+		$('.woocommerce-billing-fields__field-wrapper').html(fields_html);
 	}
 
 	/**
