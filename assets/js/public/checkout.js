@@ -109,10 +109,12 @@ WooInvoicePayment.Checkout = function()
 		if ( hide ){
 			$(billingFields).hide();
 			$(shipToDifferent).hide();
+			$(document).trigger('woocommerce-invoice-payment-billing-fields-toggled', [hide]);
 			return;
 		}
 		$(billingFields).show();
 		$(shipToDifferent).show();
+		$(document).trigger('woocommerce-invoice-payment-billing-fields-toggled', [hide]);
 	}
 
 	return self.bindEvents();
