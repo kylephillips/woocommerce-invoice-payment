@@ -107,11 +107,13 @@ WooInvoicePayment.Checkout = function()
 		var billingFields = $('.woocommerce-billing-fields').find('.form-row, .address-book-selection').not('#billing_first_name_field').not('#billing_last_name_field').not('#billing_email_field');
 		var shipToDifferent = $('#ship-to-different-address');
 		if ( hide ){
+			$('.woocommerce-checkout').addClass('billing-fields-hidden');
 			$(billingFields).hide();
 			$(shipToDifferent).hide();
 			$(document).trigger('woocommerce-invoice-payment-billing-fields-toggled', [hide]);
 			return;
 		}
+		$('.woocommerce-checkout').removeClass('billing-fields-hidden');
 		$(billingFields).show();
 		$(shipToDifferent).show();
 		$(document).trigger('woocommerce-invoice-payment-billing-fields-toggled', [hide]);
