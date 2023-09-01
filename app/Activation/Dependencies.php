@@ -43,11 +43,12 @@ class Dependencies
 			WOOINVOICEPAYMENT_VERSION,
 			true
 		);
+		$hide_billing = ( $this->user_repo->customerAllowed() && $this->settings->hideBillingInCheckout() ) ? '1' : '0';
 		$localized_data = [
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
-			'nonce' => wp_create_nonce('woocommerce_invoice_payment')
+			'nonce' => wp_create_nonce('woocommerce_invoice_payment'),
+			'hide_billing_fields' => $hide_billing
 		];
-		$localized_data['hide_checkout_billing'] = ( $this->user_repo->customerAllowed() && $this->settings->hideBillingInCheckout() && WC()->session->get('chosen_payment_method') == 'invoice' ) ? true : false;
 		wp_localize_script(
 			'woocommerce-invoice-payment',
 			'woocommerce_invoice_payment',
@@ -66,9 +67,6 @@ class Dependencies
 			[],
 			WOOINVOICEPAYMENT_VERSION
 		);
-		if ( $this->user_repo->customerAllowed() && $this->settings->hideBillingInCheckout() && WC()->session->get('chosen_payment_method') == 'invoice' ) :
-			echo '<style>.woocommerce-checkout .woocommerce-billing-fields {display:none; !important}</style>';
-		endif;
 	}
 
 	/**

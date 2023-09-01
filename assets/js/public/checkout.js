@@ -10,13 +10,13 @@ WooInvoicePayment.Checkout = function()
 	var $ = jQuery;
 
 	self.selectors = {
-		paymentMethodRadio : 'input[name="payment_method"]',
-		billingFields : '.woocommerce-billing-fields'
+		paymentMethodRadio : 'input[name="payment_method"]'
 	}
 
 	self.bindEvents = function()
 	{
 		$(document).ready(function(){
+			if ( woocommerce_invoice_payment.hide_billing_fields !== '1' ) return;
 			self.toggleBillingTerms();
 			setTimeout(function(){
 				self.updateSessionPaymentMethod();
@@ -42,14 +42,17 @@ WooInvoicePayment.Checkout = function()
 	*/
 	self.toggleBillingTerms = function()
 	{
-		var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
-		if ( typeof payment_method === 'undefined' || payment_method === '' ) return;
-		var billing_section = $('.woocommerce-billing-fields');
-		if ( payment_method !== 'invoice' ) {
-			$(billing_section).show();
+		if ( woocommerce_invoice_payment.hide_billing_fields !== '1' ){
+			self.toggleBillingFields(false);
 			return;
 		}
-		$(billing_section).hide();
+		var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
+		if ( typeof payment_method === 'undefined' || payment_method === '' ) return;
+		if ( payment_method !== 'invoice' ) {
+			self.toggleBillingFields(false);
+			return;
+		}
+		self.toggleBillingFields(true);
 	}
 
 	/**
@@ -71,6 +74,7 @@ WooInvoicePayment.Checkout = function()
 				payment_method: payment_method,
 			},
 			success: function(d){
+				if ( woocommerce_invoice_payment.hide_billing_fields !== '1' ) return;
 				var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
 				var billing_fields = ( d.data.new_payment_method === 'invoice' ) ? '' : d.data.billing_fields;
 				self.populateBillingFields(d.data.billing_fields);
@@ -100,11 +104,15 @@ WooInvoicePayment.Checkout = function()
 	*/
 	self.toggleBillingFields = function(hide)
 	{
+		var billingFields = $('.woocommerce-billing-fields').find('.form-row, .address-book-selection').not('#billing_first_name_field').not('#billing_last_name_field').not('#billing_email_field');
+		var shipToDifferent = $('#ship-to-different-address');
 		if ( hide ){
-			$(self.selectors.billingFields).hide();
+			$(billingFields).hide();
+			$(shipToDifferent).hide();
 			return;
 		}
-		$(self.selectors.billingFields).show();
+		$(billingFields).show();
+		$(shipToDifferent).show();
 	}
 
 	return self.bindEvents();
