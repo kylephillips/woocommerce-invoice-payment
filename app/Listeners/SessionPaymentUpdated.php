@@ -51,7 +51,9 @@ class SessionPaymentUpdated
 	{
 		$payment_method = sanitize_text_field($_POST['payment_method']);
 		$old_payment_method = WC()->session->get('chosen_payment_method');
-		$billing_fields = $this->fields_required->getBillingFields();
+		$billing_fields = ( $payment_method == 'invoice' ) 
+			? $this->fields_required->getInvoiceBillingFields()
+			: $this->fields_required->getBillingFields(false);
 		WC()->session->set('chosen_payment_method', $payment_method);
 		$data['hide_billing'] = ( $this->user_repo->customerAllowed() && $this->settings->hideBillingInCheckout() && $payment_method == 'invoice' ) ? true : false;
 		$data['old_payment_method'] = $old_payment_method;
