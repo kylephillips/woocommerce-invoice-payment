@@ -14,6 +14,7 @@ WooInvoicePaymentAdmin.Factory = function()
 
 	self.build = function()
 	{
+		new WooInvoicePaymentAdmin.Settings;
 		self.initializeSelectWoo();
 	};
 

@@ -43,6 +43,7 @@ class Bootstrap
 		if ( !class_exists('WC_Payment_Gateway') ) return;
 		new PaymentMethod\PaymentMethod;
 		new PaymentMethod\FieldsRequired;
+		new Taxes\DisableTaxes;
 	}
 
 	/**

@@ -1,12 +1,10 @@
 var gulp = require('gulp');
-var sass = require('gulp-sass');
+var sass = require('gulp-sass')(require('sass'));
 var autoprefix = require('gulp-autoprefixer');
 var livereload = require('gulp-livereload');
-var notify = require('gulp-notify');
 var minifycss = require('gulp-minify-css');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
-var pump = require('pump');
 
 // Style Paths
 var scss_admin = [
@@ -19,6 +17,7 @@ var css = 'assets/css/';
 
 // JS Paths
 var js_source_admin = [
+	'assets/js/admin/settings.js',
 	'assets/js/admin/factory.js'
 ];
 var js_source_public = [

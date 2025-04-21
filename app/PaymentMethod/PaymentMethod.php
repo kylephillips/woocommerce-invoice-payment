@@ -88,6 +88,24 @@ class PaymentMethod extends \WC_Payment_Gateway
                 'default'     => 'no',
                 'description' => __( 'If a billing address is not required when using an invoiced account, select this option to remove the fields from checkout.', WOOINVOICEPAYMENT_DOMAIN ),
             ],
+            'disable_taxes' => [
+                'title'       => __( 'Disable Taxes', WOOINVOICEPAYMENT_DOMAIN ),
+                'label'       => __( 'Disable taxes on orders when paying by invoice.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'checkbox',
+                'default'     => 'no'
+            ],
+            'tax_disabled_totals_message' => [
+                'title'       => __( 'Label for tax totals if disabled', WOOINVOICEPAYMENT_DOMAIN ),
+                'description'       => __( 'Defaults to 0.00.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'text',
+                'class'	=> 'tax-disabled-totals-message'
+            ],
+            'disable_shipping' => [
+                'title'       => __( 'Disable Shipping', WOOINVOICEPAYMENT_DOMAIN ),
+                'label'       => __( 'Disable shipping methods on orders when paying by invoice.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'checkbox',
+                'default'     => 'no'
+            ],
             'customer_roles_title' => [
                 'title'       => __( 'Customer Roles', WOOINVOICEPAYMENT_DOMAIN ),
                 'type'        => 'title',
