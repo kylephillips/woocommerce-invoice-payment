@@ -47,7 +47,8 @@ class Dependencies
 		$localized_data = [
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce('woocommerce_invoice_payment'),
-			'hide_billing_fields' => $hide_billing
+			'hide_billing_fields' => $hide_billing,
+			'hide_tax_subtotal' => $this->settings->hideTaxSubtotals()
 		];
 		wp_localize_script(
 			'woocommerce-invoice-payment',

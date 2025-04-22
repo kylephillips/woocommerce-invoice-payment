@@ -94,6 +94,13 @@ class PaymentMethod extends \WC_Payment_Gateway
                 'type'        => 'checkbox',
                 'default'     => 'no'
             ],
+            'hide_tax_subtotal' => [
+                'title'       => __( 'Hide taxes in subtotals', WOOINVOICEPAYMENT_DOMAIN ),
+                'label'       => __( 'Remove the taxes line item in checkout subtotals.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'checkbox',
+                'class'	=> 'tax-disabled-totals-message',
+                'default'     => 'no'
+            ],
             'tax_disabled_totals_message' => [
                 'title'       => __( 'Label for tax totals if disabled', WOOINVOICEPAYMENT_DOMAIN ),
                 'description'       => __( 'Defaults to 0.00.', WOOINVOICEPAYMENT_DOMAIN ),
@@ -105,6 +112,34 @@ class PaymentMethod extends \WC_Payment_Gateway
                 'label'       => __( 'Disable shipping methods on orders when paying by invoice.', WOOINVOICEPAYMENT_DOMAIN ),
                 'type'        => 'checkbox',
                 'default'     => 'no'
+            ],
+            'hide_shipping_subtotal' => [
+                'title'       => __( 'Hide shipping in subtotals.', WOOINVOICEPAYMENT_DOMAIN ),
+                'label'       => __( 'Remove the shipping line item in checkout subtotals.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'checkbox',
+                'class'	=> 'shipping-disabled-message',
+                'default'     => 'no'
+            ],
+            'shipping_disabled_message' => [
+                'title'       => __( 'Label for shipping if disabled', WOOINVOICEPAYMENT_DOMAIN ),
+                'description'       => __( 'Displays where shipping options would normally show. Leave blank to hide.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'text',
+                'class'	=> 'shipping-disabled-message'
+            ],
+            'require_shipping_selection' => [
+                'title'       => __( 'Require Shipping Selection', WOOINVOICEPAYMENT_DOMAIN ),
+                'label'       => __( 'Require a shipping method selection when shipping is disabled.', WOOINVOICEPAYMENT_DOMAIN ),
+                'description' => __( 'The label for disabled shipping will display above the field if this option is checked. This will force customer seleciton of a shipping method, but no payment or calculations up front.', WOOINVOICEPAYMENT_DOMAIN),
+                'type'        => 'checkbox',
+                'default'     => 'no',
+                'class'	=> 'shipping-disabled-message'
+            ],
+            'show_shipping_fields' => [
+                'title'       => __( 'Show the shipping fields', WOOINVOICEPAYMENT_DOMAIN ),
+                'label'       => __( 'Show the shipping fields, even if shipping is disabled.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'checkbox',
+                'default'     => 'no',
+                'class'	=> 'shipping-disabled-message'
             ],
             'customer_roles_title' => [
                 'title'       => __( 'Customer Roles', WOOINVOICEPAYMENT_DOMAIN ),

@@ -29,6 +29,9 @@ class DisableTaxes
 		add_filter('woocommerce_cart_totals_taxes_total_html', [$this, 'taxTotalHtml']);
 	}
 
+	/**
+	* Set the admin-defined option
+	*/
 	private function setDisabled()
 	{
 		$this->taxes_disabled = $this->settings->taxesDisabled();
@@ -38,6 +41,7 @@ class DisableTaxes
 	{
 		return ( $this->invoiceSelected() ) ? false : true;
 	}
+
 
 	public function disableInCart($cart)
 	{
@@ -52,6 +56,7 @@ class DisableTaxes
 
 	/**
 	* Is the invoice payment method selected?
+	* @return bool
 	*/
 	private function invoiceSelected()
 	{
@@ -60,12 +65,14 @@ class DisableTaxes
 	}
 
 	/**
-	* The tax total html
+	* The tax total html - displays in order totals
+	* @return str
 	*/
 	public function taxTotalHtml($html)
 	{
 		if ( !$this->invoiceSelected() ) return $html;
 		$message = $this->settings->taxTotalMessage();
-		return ( $message ) ? $message : $html;
+		$message = ( $message ) ? $message : $html;
+		return apply_filters('woocommerce_invoice_payment_taxes_message', $message);
 	}
 }

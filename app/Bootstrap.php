@@ -44,6 +44,8 @@ class Bootstrap
 		new PaymentMethod\PaymentMethod;
 		new PaymentMethod\FieldsRequired;
 		new Taxes\DisableTaxes;
+		new Shipping\DisableShipping;
+		new Shipping\ShippingMethodField;
 	}
 
 	/**

@@ -37,6 +37,22 @@ WooInvoicePayment.Checkout = function()
 	}
 
 	/**
+	* Toggle the taxes line item in the subtotals based on admin setting
+	*/
+	self.toggleTaxSubtotal = function()
+	{
+		var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
+		if ( typeof payment_method === 'undefined' || payment_method === '' ) return;
+		if ( payment_method == 'invoice' && woocommerce_invoice_payment.hide_tax_subtotal ){
+			$('.tax-total').hide();
+			$('.tax-rate').hide();
+			return;
+		}
+		$('.tax-total').show();
+		$('.tax-rate').show();
+	}
+
+	/**
 	* Hide/Show the billing address for customers paying on terms accounts
 	* (does not handle the required/validation aspect)
 	*/
@@ -79,6 +95,7 @@ WooInvoicePayment.Checkout = function()
 				var billing_fields = ( d.data.new_payment_method === 'invoice' ) ? '' : d.data.billing_fields;
 				self.populateBillingFields(d.data.billing_fields);
 				self.toggleBillingFields(d.data.hide_billing);
+				self.toggleTaxSubtotal();
 				setTimeout(function(){
 					$(document.body).trigger('country_to_state_changed'); // Reset SelectWoo
 				}, 50);
