@@ -8,9 +8,11 @@ WooInvoicePayment.Checkout = function()
 {
 	var self = this;
 	var $ = jQuery;
+	self.doing_ajax = false;
 
 	self.selectors = {
-		paymentMethodRadio : 'input[name="payment_method"]'
+		paymentMethodRadio : 'input[name="payment_method"]',
+		shippingMethodSelect : 'select[name="woocommerce_invoice_payment_shipping_choice"]'
 	}
 
 	self.bindEvents = function()
@@ -31,8 +33,16 @@ WooInvoicePayment.Checkout = function()
 		$(document).on('change', self.selectors.paymentMethodRadio, function(){
 			self.toggleBillingTerms();
 			setTimeout(function(){
+				console.log('payment method updated');
 				self.updateSessionPaymentMethod();
+				$(document.body).trigger('update_checkout');
 			}, 50);
+		});
+		$(document.body).on('checkout_error', function(){
+			self.validateShippingMethod();
+		});
+		$(document).on('change', self.selectors.shippingMethodSelect, function(){
+			self.validateShippingMethod();
 		});
 	}
 
@@ -72,12 +82,26 @@ WooInvoicePayment.Checkout = function()
 	}
 
 	/**
+	* Toggle the body class has-invoice-payment
+	*/
+	self.toggleBodyClass = function()
+	{
+		var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
+		if ( payment_method == 'invoice' ){
+			$('body').addClass('has-invoice-payment-method');
+			return;
+		}
+		$('body').removeClass('has-invoice-payment-method');
+	}
+
+	/**
 	* Update the session payment method on change
 	* This updates the required/validation for the selected payment method
 	* The response includes the billing fields, since we do not require them for invoicing
 	*/
 	self.updateSessionPaymentMethod = function()
 	{
+		self.doing_ajax = true;
 		var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
 		if ( typeof payment_method === 'undefined' || payment_method === '' ) return;
 		$.ajax({
@@ -90,15 +114,17 @@ WooInvoicePayment.Checkout = function()
 				payment_method: payment_method,
 			},
 			success: function(d){
+				self.doing_ajax = false;
 				if ( woocommerce_invoice_payment.hide_billing_fields !== '1' ) return;
 				var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
 				var billing_fields = ( d.data.new_payment_method === 'invoice' ) ? '' : d.data.billing_fields;
 				self.populateBillingFields(d.data.billing_fields);
 				self.toggleBillingFields(d.data.hide_billing);
 				self.toggleTaxSubtotal();
+				self.toggleBodyClass();
 				setTimeout(function(){
 					$(document.body).trigger('country_to_state_changed'); // Reset SelectWoo
-				}, 50);
+				}, 500);
 			},
 			error: function(d){
 				console.log(d);
@@ -134,6 +160,24 @@ WooInvoicePayment.Checkout = function()
 		$(billingFields).show();
 		$(shipToDifferent).show();
 		$(document).trigger('woocommerce-invoice-payment-billing-fields-toggled', [hide]);
+	}
+
+	/**
+	* Validate the shipping method custom field
+	* @see woocommerce/assets/js/frontend/checkout.js
+	*/
+	self.validateShippingMethod = function()
+	{
+		var field = $(self.selectors.shippingMethodSelect);
+		var row = $(field).parents('tr');
+		var parent = $(field).parents('.form-row');
+		if ( $(field).val() == '' || $(field).val() == 0 ){
+			$(row).addClass('has-error');
+			$(parent).addClass('woocommerce-invalid-required-field');
+			return;
+		}
+		$(row).removeClass('has-error');
+		$(parent).removeClass('woocommerce-invalid-required-field');
 	}
 
 	return self.bindEvents();

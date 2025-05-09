@@ -17,6 +17,7 @@ var css = 'assets/css/';
 
 // JS Paths
 var js_source_admin = [
+	'assets/js/admin/shipping-options-field.js',
 	'assets/js/admin/settings.js',
 	'assets/js/admin/factory.js'
 ];

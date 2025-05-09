@@ -134,6 +134,14 @@ class PaymentMethod extends \WC_Payment_Gateway
                 'default'     => 'no',
                 'class'	=> 'shipping-disabled-message'
             ],
+            'shipping_options' => [
+                'title'       => __( 'Shipping Options', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'repeater_shipping_options',
+                'default'     => 'none',
+                'description' => __( 'Add the shipping options available to select from.', WOOINVOICEPAYMENT_DOMAIN ),
+                'class' => 'invoice-payment-repeater',
+                'desc_tip'    => false
+            ],
             'show_shipping_fields' => [
                 'title'       => __( 'Show the shipping fields', WOOINVOICEPAYMENT_DOMAIN ),
                 'label'       => __( 'Show the shipping fields, even if shipping is disabled.', WOOINVOICEPAYMENT_DOMAIN ),
@@ -214,4 +222,18 @@ class PaymentMethod extends \WC_Payment_Gateway
 		}
 		return true;
 	}
+
+	/**
+    * Validate the locations
+    */
+    public function validate_repeater_shipping_options_field($field_key, $data)
+    {
+        if ( !$data ) return;
+        foreach ( $data as $key => $option ) :
+        	if ( $data[$key]['name'] == '' ) continue;
+        	$data[$key]['name'] = sanitize_text_field($data[$key]['name']);
+        endforeach;
+        return $data;
+    }
+       
 }

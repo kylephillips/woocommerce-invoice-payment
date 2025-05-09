@@ -55,6 +55,7 @@ class Bootstrap
 	{
 		new Activation\Dependencies;
 		new Events\PublicEvents;
+		new Fields\ShippingRepeater;
 	}
 
 	/**

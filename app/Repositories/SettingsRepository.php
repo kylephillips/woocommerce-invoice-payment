@@ -96,4 +96,14 @@ class SettingsRepository
 		$option = get_option('woocommerce_invoice_settings');
 		return ( isset($option['require_shipping_selection']) && $option['require_shipping_selection'] == 'yes' ) ? true : false;
 	}
+
+	/**
+	* Get the available shipping options
+	* @return bool
+	*/
+	public function shippingOptions()
+	{
+		$option = get_option('woocommerce_invoice_settings');
+		return ( isset($option['shipping_options']) ) ? $option['shipping_options'] : false;
+	}
 }
