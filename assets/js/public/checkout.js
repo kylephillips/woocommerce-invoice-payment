@@ -182,17 +182,25 @@ WooInvoicePayment.Checkout = function()
 	}
 
 	/**
+	* Is a local pickup option selected?
+	*/
+	self.localPickupSelected = function()
+	{
+		var selected = $(self.selectors.shippingMethodSelect).val();
+		return ( selected.includes('_local_pickup_expanded') ) ? true : false;
+	}
+
+	/**
 	* Toggle local pickup options if available
 	*/
 	self.toggleLocalPickup = function()
 	{
-		var selected = $(self.selectors.shippingMethodSelect).val();
 		var local_pickup_fields = $('.woocommerce-local-pickup-expanded-checkout');
-		if ( selected.includes('_local_pickup_expanded') ){
+		if ( self.localPickupSelected() ){
 			$(local_pickup_fields).show();
 			return;
 		}
-		$(local_pickup_fields).hide();
+		$(local_pickup_fields).show();
 	}
 
 	return self.bindEvents();
