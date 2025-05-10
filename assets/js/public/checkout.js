@@ -43,6 +43,7 @@ WooInvoicePayment.Checkout = function()
 		});
 		$(document).on('change', self.selectors.shippingMethodSelect, function(){
 			self.validateShippingMethod();
+			self.toggleLocalPickup();
 		});
 	}
 
@@ -178,6 +179,20 @@ WooInvoicePayment.Checkout = function()
 		}
 		$(row).removeClass('has-error');
 		$(parent).removeClass('woocommerce-invalid-required-field');
+	}
+
+	/**
+	* Toggle local pickup options if available
+	*/
+	self.toggleLocalPickup = function()
+	{
+		var selected = $(self.selectors.shippingMethodSelect).val();
+		var local_pickup_fields = $('.woocommerce-local-pickup-expanded-checkout');
+		if ( selected.includes('_local_pickup_expanded') ){
+			$(local_pickup_fields).show();
+			return;
+		}
+		$(local_pickup_fields).hide();
 	}
 
 	return self.bindEvents();

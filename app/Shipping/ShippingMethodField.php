@@ -31,7 +31,11 @@ class ShippingMethodField extends ShippingBase
 		if ( $options ) :
 			$choices = [];
 			foreach ( $options as $option ) :
-				$choices[] = $option['name'];
+				if ( $option['local_pickup'] && $option['local_pickup'] == 'yes' ) {
+					$choices[$option['name'] . '_local_pickup_expanded'] = $option['name'];
+					continue;
+				}
+				$choices[$option['name']] = $option['name'];
 			endforeach;
 			$first_option = apply_filters('woocommerce_invoice_payment_shipping_select_label', __('Select a shipping method', WOOINVOICEPAYMENT_DOMAIN));
 			array_unshift($choices, $first_option);
@@ -42,6 +46,7 @@ class ShippingMethodField extends ShippingBase
 			]);
 		endif;
 		echo ( $el == 'tr' ) ? '</td></tr>' : '</' . $el . '>';
+		$this->localPickupOptions();
 	}
 
 	/**
@@ -72,5 +77,25 @@ class ShippingMethodField extends ShippingBase
 				sanitize_text_field($_POST['woocommerce_invoice_payment_shipping_choice']) 
 			);
 		}
+	}
+
+	/**
+	* Local pickup fields if plugin is enabled
+	*/
+	private function localPickupOptions()
+	{
+		$local_pickup = ( class_exists('\WooLocalPickupExpanded\Bootstrap') ) ? true : false;
+		if ( !$local_pickup ) return;
+		$user = wp_get_current_user();
+		$repo = new \WooLocalPickupExpanded\Repositories\LocationRepository;
+		$locations = $repo->locations();
+		if ( empty($locations) ) return;
+		\WooLocalPickupExpanded\Helpers::view('checkout-fields', [
+			'user' => $user, 
+			'locations' => $locations,
+			'repo' => $repo,
+			'hide' => true,
+			'css_class' => 'woocommerce-invoice-payment-local-pickup-options'
+		]);
 	}
 }

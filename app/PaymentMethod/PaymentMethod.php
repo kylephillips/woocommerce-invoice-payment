@@ -232,6 +232,7 @@ class PaymentMethod extends \WC_Payment_Gateway
         foreach ( $data as $key => $option ) :
         	if ( $data[$key]['name'] == '' ) continue;
         	$data[$key]['name'] = sanitize_text_field($data[$key]['name']);
+        	$data[$key]['local_pickup'] = ( isset($data[$key]['local_pickup']) && $data[$key]['local_pickup'] == 'yes' ) ? 'yes' : null;
         endforeach;
         return $data;
     }
