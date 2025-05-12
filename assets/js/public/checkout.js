@@ -32,6 +32,8 @@ WooInvoicePayment.Checkout = function()
 		});
 		$(document.body).on('updated_checkout', function(){
 			self.toggleLocalPickup();
+			self.toggleTaxSubtotal();
+			self.toggleBodyClass();
 		});
 		$(document).on('change', self.selectors.shippingMethodSelect, function(){
 			setTimeout(function(){
@@ -130,9 +132,6 @@ WooInvoicePayment.Checkout = function()
 				var billing_fields = ( d.data.new_payment_method === 'invoice' ) ? '' : d.data.billing_fields;
 				self.populateBillingFields(d.data.billing_fields);
 				self.toggleBillingFields(d.data.hide_billing);
-				self.toggleTaxSubtotal();
-				self.toggleBodyClass();
-				self.toggleShippingFields();
 				setTimeout(function(){
 					$(document.body).trigger('country_to_state_changed'); // Reset SelectWoo
 					$(document.body).trigger('update_checkout');
@@ -222,47 +221,6 @@ WooInvoicePayment.Checkout = function()
 			return;
 		}
 		$(local_pickup_fields).hide();
-	}
-
-	/**
-	* Toggle the shipping fields if local pickup is selected
-	*/
-	self.toggleShippingFields = function()
-	{
-		var hide = ( self.localPickupSelected() ) ? true : false;
-		var choices = 0;
-		var shipping_select = $('select[name="woocommerce_invoice_payment_shipping_choice"]'); // Invoice payment shipping dropdown (optional)
-		var shippingFields = $('.shipping_address');
-
-		if ( !self.invoicePaymentSelected() ) hide = false;
-
-		// Account for radio and select fields
-		choices = ( $('select.shipping_method').length > 1  ) ? $('select.shipping_method').find('option').length : $('input.shipping_method').length;
-		if ( choices < 2 ) hide = false;
-
-		if ( shipping_select.length > 0 && $('select[name="woocommerce_invoice_payment_shipping_choice"] option:checked').val().includes('_local_pickup_expanded') ) hide = true;
-
-		if ( $('.address-book-selection').length > 0 ){
-			var shippingFields = $('.shipping_address').find('.form-row, .address-book-selection');
-		} 
-
-		var shippingHeader = $('.woocommerce-shipping-fields').find('h3');
-		var shipToDifferent = $('#ship-to-different-address');
-		if ( hide ){
-			$('body').addClass('shipping-fields-hidden');
-			$('.woocommerce-shipping-fields .address-book-selection').hide();
-			$(shippingFields).hide();
-			$(shippingHeader).hide();
-			$(shipToDifferent).hide();
-			$('#ship-to-different-address-checkbox').removeAttr('checked');
-			return;
-		}
-		$('body').removeClass('shipping-fields-hidden');
-		
-		$('.woocommerce-shipping-fields .address-book-selection').show();
-		$(shipToDifferent).show();
-		$(shippingFields).show();
-		$(shippingHeader).show();
 	}
 
 	return self.bindEvents();
