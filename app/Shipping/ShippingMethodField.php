@@ -43,7 +43,7 @@ class ShippingMethodField extends ShippingBase
 				'type' => 'select',
 				'required' => true,
 				'options' => $choices
-			]);
+			], WC()->session->get('invoice_payment_shipping_method'));
 		endif;
 		echo ( $el == 'tr' ) ? '</td></tr>' : '</' . $el . '>';
 		$this->localPickupOptions();

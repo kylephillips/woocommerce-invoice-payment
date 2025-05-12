@@ -24,8 +24,16 @@ WooInvoicePayment.Checkout = function()
 				self.updateSessionPaymentMethod();
 			}, 50);
 		});
-		$(document).on('payment_method_selected', function(){
+		$(document.body).on('payment_method_selected', function(){
 			self.toggleBillingTerms();
+			setTimeout(function(){
+				self.updateSessionPaymentMethod();
+			}, 50);
+		});
+		$(document.body).on('updated_checkout', function(){
+			self.toggleLocalPickup();
+		});
+		$(document).on('change', self.selectors.shippingMethodSelect, function(){
 			setTimeout(function(){
 				self.updateSessionPaymentMethod();
 			}, 50);
@@ -33,7 +41,6 @@ WooInvoicePayment.Checkout = function()
 		$(document).on('change', self.selectors.paymentMethodRadio, function(){
 			self.toggleBillingTerms();
 			setTimeout(function(){
-				console.log('payment method updated');
 				self.updateSessionPaymentMethod();
 				$(document.body).trigger('update_checkout');
 			}, 50);
@@ -105,6 +112,7 @@ WooInvoicePayment.Checkout = function()
 		self.doing_ajax = true;
 		var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
 		if ( typeof payment_method === 'undefined' || payment_method === '' ) return;
+		var shipping_method = $(self.selectors.shippingMethodSelect).val();
 		$.ajax({
 			url: woocommerce_invoice_payment.ajaxurl,
 			type: 'post',
@@ -113,6 +121,7 @@ WooInvoicePayment.Checkout = function()
 				action: 'update_session_payment_method',
 				nonce: woocommerce_invoice_payment.nonce,
 				payment_method: payment_method,
+				shipping_method: shipping_method
 			},
 			success: function(d){
 				self.doing_ajax = false;
@@ -123,8 +132,10 @@ WooInvoicePayment.Checkout = function()
 				self.toggleBillingFields(d.data.hide_billing);
 				self.toggleTaxSubtotal();
 				self.toggleBodyClass();
+				self.toggleShippingFields();
 				setTimeout(function(){
 					$(document.body).trigger('country_to_state_changed'); // Reset SelectWoo
+					$(document.body).trigger('update_checkout');
 				}, 500);
 			},
 			error: function(d){
@@ -182,25 +193,76 @@ WooInvoicePayment.Checkout = function()
 	}
 
 	/**
+	* Is invoice payment selected?
+	*/
+	self.invoicePaymentSelected = function()
+	{
+		return ( $(self.selectors.paymentMethodRadio + ':checked').val() === 'invoice' ) ? true : false;
+	}
+
+	/**
 	* Is a local pickup option selected?
 	*/
 	self.localPickupSelected = function()
 	{
 		var selected = $(self.selectors.shippingMethodSelect).val();
-		return ( selected.includes('_local_pickup_expanded') ) ? true : false;
+		return ( typeof selected !== 'undefined' && selected.includes('_local_pickup_expanded') ) ? true : false;
 	}
 
 	/**
-	* Toggle local pickup options if available
+	* Toggle local pickup options if available (invoice payment and local pickup both selected)
+	* Integration with Local Pickup Expanded
 	*/
 	self.toggleLocalPickup = function()
 	{
+		if ( !self.invoicePaymentSelected() ) return;
 		var local_pickup_fields = $('.woocommerce-local-pickup-expanded-checkout');
 		if ( self.localPickupSelected() ){
 			$(local_pickup_fields).show();
 			return;
 		}
-		$(local_pickup_fields).show();
+		$(local_pickup_fields).hide();
+	}
+
+	/**
+	* Toggle the shipping fields if local pickup is selected
+	*/
+	self.toggleShippingFields = function()
+	{
+		var hide = ( self.localPickupSelected() ) ? true : false;
+		var choices = 0;
+		var shipping_select = $('select[name="woocommerce_invoice_payment_shipping_choice"]'); // Invoice payment shipping dropdown (optional)
+		var shippingFields = $('.shipping_address');
+
+		if ( !self.invoicePaymentSelected() ) hide = false;
+
+		// Account for radio and select fields
+		choices = ( $('select.shipping_method').length > 1  ) ? $('select.shipping_method').find('option').length : $('input.shipping_method').length;
+		if ( choices < 2 ) hide = false;
+
+		if ( shipping_select.length > 0 && $('select[name="woocommerce_invoice_payment_shipping_choice"] option:checked').val().includes('_local_pickup_expanded') ) hide = true;
+
+		if ( $('.address-book-selection').length > 0 ){
+			var shippingFields = $('.shipping_address').find('.form-row, .address-book-selection');
+		} 
+
+		var shippingHeader = $('.woocommerce-shipping-fields').find('h3');
+		var shipToDifferent = $('#ship-to-different-address');
+		if ( hide ){
+			$('body').addClass('shipping-fields-hidden');
+			$('.woocommerce-shipping-fields .address-book-selection').hide();
+			$(shippingFields).hide();
+			$(shippingHeader).hide();
+			$(shipToDifferent).hide();
+			$('#ship-to-different-address-checkbox').removeAttr('checked');
+			return;
+		}
+		$('body').removeClass('shipping-fields-hidden');
+		
+		$('.woocommerce-shipping-fields .address-book-selection').show();
+		$(shipToDifferent).show();
+		$(shippingFields).show();
+		$(shippingHeader).show();
 	}
 
 	return self.bindEvents();

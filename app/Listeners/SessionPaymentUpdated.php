@@ -59,6 +59,15 @@ class SessionPaymentUpdated
 		$data['old_payment_method'] = $old_payment_method;
 		$data['new_payment_method'] = $payment_method;
 		$data['billing_fields'] = $billing_fields;
+
+		// Local Pickup Expanded Integration for hiding/unrequiring shipping 
+		$shipping_method = ( $_POST['shipping_method'] && $_POST['shipping_method'] !== '' ) 
+			? sanitize_text_field($_POST['shipping_method']) : '';
+		$shipping_required = ( str_contains($shipping_method, '_local_pickup_expanded') ) ? 'yes' : 'no';
+		WC()->session->set('force_local_pickup_expanded', $shipping_required);
+		WC()->session->set('invoice_payment_shipping_method', $shipping_method);
+		$data['shipping_method'] = $shipping_method;
+
 		$this->respond('success', sprintf('Session payment method updated to: %s', $payment_method), $data);
 	}
 
