@@ -18,7 +18,7 @@ class ShippingMethodField extends ShippingBase
 	{
 		if ( !$this->invoiceSelected() ) return;
 		if ( !$this->settings->shippingSelectionRequired() ) return;
-		$options = $this->settings->shippingOptions();
+		$options = apply_filters('woocommerce_invoice_payment_shipping_options', $this->settings->shippingOptions());
 		$message = '<p class="invoice-payment-shipping-message">' . $this->settings->shippingMessage() . '</p>';
 
 		$el = apply_filters('woocommerce_invoice_payment_shipping_select_element', 'tr');
