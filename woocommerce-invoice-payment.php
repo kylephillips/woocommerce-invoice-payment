@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Invoice Payment
 Plugin URI: https://github.com/kylephillips
 Description: Enables a new payment method that allows customers to pay via terms/invoice towards their account.
-Version: 1.0.6
+Version: 1.0.7
 Author: Kyle Phillips
 Author URI: https://github.com/kylephillips
 License: GPL

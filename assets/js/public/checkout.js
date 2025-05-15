@@ -131,6 +131,7 @@ WooInvoicePayment.Checkout = function()
 				var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
 				var billing_fields = ( d.data.new_payment_method === 'invoice' ) ? '' : d.data.billing_fields;
 				self.populateBillingFields(d.data.billing_fields);
+				self.populateShippingFields(d.data.shipping_fields);
 				self.toggleBillingFields(d.data.hide_billing);
 				setTimeout(function(){
 					$(document.body).trigger('country_to_state_changed'); // Reset SelectWoo
@@ -151,6 +152,16 @@ WooInvoicePayment.Checkout = function()
 	self.populateBillingFields = function(fields_html)
 	{
 		$('.woocommerce-billing-fields__field-wrapper').html(fields_html);
+	}
+
+	/**
+	* Populate shipping fields if applicable 
+	* For compatibility with local pickup expanded
+	*/
+	self.populateShippingFields = function(fields_html)
+	{
+		if ( !fields_html ) return;
+		$('.woocommerce-shipping-fields__field-wrapper').html(fields_html);
 	}
 
 	/**

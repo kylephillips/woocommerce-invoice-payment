@@ -22,7 +22,7 @@ class Bootstrap
 	{
 		$plugin_directory = plugins_url() . '/' . basename(dirname(dirname(__FILE__)));
 		define('WOOINVOICEPAYMENT_PLUGIN_DIRECTORY', $plugin_directory);
-		define('WOOINVOICEPAYMENT_VERSION', '1.0.6');
+		define('WOOINVOICEPAYMENT_VERSION', '1.0.7');
 		define('WOOINVOICEPAYMENT_DOMAIN', 'woocommerce-invoice-payment'); // Localization domain
 	}
 

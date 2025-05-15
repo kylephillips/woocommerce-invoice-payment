@@ -54,11 +54,18 @@ class SessionPaymentUpdated
 		$billing_fields = ( $payment_method == 'invoice' ) 
 			? $this->fields_required->getInvoiceBillingFields()
 			: $this->fields_required->getBillingFields(false);
+		
+		$shipping_fields = false;
+		if ( class_exists('\WooLocalPickupExpanded\ShippingMethod\FieldsRequired') ) :
+			$shipping_fields = ( new \WooLocalPickupExpanded\ShippingMethod\FieldsRequired )->getShippingFields();
+		endif;
+		
 		WC()->session->set('chosen_payment_method', $payment_method);
 		$data['hide_billing'] = ( $this->user_repo->customerAllowed() && $this->settings->hideBillingInCheckout() && $payment_method == 'invoice' ) ? true : false;
 		$data['old_payment_method'] = $old_payment_method;
 		$data['new_payment_method'] = $payment_method;
 		$data['billing_fields'] = $billing_fields;
+		$data['shipping_fields'] = $shipping_fields;
 
 		// Local Pickup Expanded Integration for hiding/unrequiring shipping 
 		$shipping_method = ( $_POST['shipping_method'] && $_POST['shipping_method'] !== '' ) 
