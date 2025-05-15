@@ -22,7 +22,7 @@ class Bootstrap
 	{
 		$plugin_directory = plugins_url() . '/' . basename(dirname(dirname(__FILE__)));
 		define('WOOINVOICEPAYMENT_PLUGIN_DIRECTORY', $plugin_directory);
-		define('WOOINVOICEPAYMENT_VERSION', '1.0.4');
+		define('WOOINVOICEPAYMENT_VERSION', '1.0.5');
 		define('WOOINVOICEPAYMENT_DOMAIN', 'woocommerce-invoice-payment'); // Localization domain
 	}
 
@@ -56,6 +56,7 @@ class Bootstrap
 		new Activation\Dependencies;
 		new Events\PublicEvents;
 		new Fields\ShippingRepeater;
+		new OrderTotals\OrderTotals;
 	}
 
 	/**
@@ -65,7 +66,7 @@ class Bootstrap
 	{
 		load_plugin_textdomain(
 			WOOINVOICEPAYMENT_DOMAIN, 
-			false, 
+			dirname( dirname( plugin_basename( __FILE__ ) ) . '/languages' ), 
 			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages' );
 	}
 }

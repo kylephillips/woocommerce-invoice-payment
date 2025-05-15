@@ -10,6 +10,7 @@ WooInvoicePaymentAdmin.ShippingOptionsField = function()
 
 	self.selectors = {
 		wrapper : '.woocommerce-invoice-payment-repeater-wrapper',
+		table : '.woocommerce-invoice-payment-repeater',
 		row : '.woocommerce-invoice-payment-repeater-row',
 		addNewButton : '[data-woocommerce-invoice-payment-repeater-add-new]',
 		removeButton : '.woocommerce-invoice-payment-repeater-remove-row a'
@@ -36,7 +37,7 @@ WooInvoicePaymentAdmin.ShippingOptionsField = function()
 	self.addNewLocation = function()
 	{
 		var fields = woocommerce_invoice_payment.shipping_options_fields;
-		$(self.selectors.wrapper).append(fields);
+		$(self.selectors.table).append(fields);
 		setTimeout(function(){
 			self.reindexInputs();
 		}, 50);
@@ -73,6 +74,7 @@ WooInvoicePaymentAdmin.ShippingOptionsField = function()
 				$(this).attr('name', oldName.replace(reg, 'woocommerce_invoice_shipping_options[' + newIndex + ']'));
 			});
 		});
+		$('.woocommerce-invoice-payment-repeater').sortable('refresh');
 	}
 
 	self.enableSortable = function()
