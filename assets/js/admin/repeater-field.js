@@ -29,6 +29,9 @@ WooInvoicePaymentAdmin.RepeaterField = function()
 			e.preventDefault();
 			self.removeRow($(this));
 		});
+		$(document).on('change', '.disable-billing-field-select', function(){
+			self.toggleDisableBillingCustom($(this));
+		});
 	}
 
 	/**
@@ -40,6 +43,7 @@ WooInvoicePaymentAdmin.RepeaterField = function()
 		var fields = null;
 		if ( field_type === 'shipping_option' ) fields = woocommerce_invoice_payment.shipping_options_fields;
 		if ( field_type === 'override_billing_fields' ) fields = woocommerce_invoice_payment.override_billing_fields;
+		if ( field_type === 'disable_billing_fields' ) fields = woocommerce_invoice_payment.disable_billing_fields;
 		var wrapper = $(button).siblings(self.selectors.wrapper);
 		$(wrapper).find(self.selectors.table).append(fields);
 		setTimeout(function(){
@@ -71,6 +75,10 @@ WooInvoicePaymentAdmin.RepeaterField = function()
 		}
 		if ( field_type === 'override_billing_fields' ){
 			self.reindexOverrideBillingFields();
+			return;
+		}
+		if ( field_type === 'disable_billing_fields' ){
+			self.reindexDisableBillingFields();
 			return;
 		}
 	}
@@ -123,6 +131,30 @@ WooInvoicePaymentAdmin.RepeaterField = function()
 		$(wrapper).find('.woocommerce-invoice-payment-repeater').sortable('refresh');
 	}
 
+	/**
+	* Reindex Disable Billing Fields
+	*/
+	self.reindexDisableBillingFields = function()
+	{
+		var wrapper = $('[' + self.selectors.addNewButton + '="disable_billing_fields"]').siblings(self.selectors.wrapper);
+		var rows = $(wrapper).find(self.selectors.row);
+		var reg = /woocommerce_invoice_disable_billing_fields\[\d\]/;
+		$.each(rows, function(i){
+			var newIndex = i;
+			var inputs = $(this).find('input');
+			var selects = $(this).find('select');
+			$.each(inputs, function(){
+				var oldName = $(this).attr('name');
+				$(this).attr('name', oldName.replace(reg, 'woocommerce_invoice_disable_billing_fields[' + newIndex + ']'));
+			});
+			$.each(selects, function(){
+				var oldName = $(this).attr('name');
+				$(this).attr('name', oldName.replace(reg, 'woocommerce_invoice_disable_billing_fields[' + newIndex + ']'));
+			});
+		});
+		$(wrapper).find('.woocommerce-invoice-payment-repeater').sortable('refresh');
+	}
+
 	self.enableSortable = function()
 	{
 		$('.woocommerce-invoice-payment-repeater').sortable({
@@ -139,6 +171,17 @@ WooInvoicePaymentAdmin.RepeaterField = function()
     			);
     		},
 		});
+	}
+
+	self.toggleDisableBillingCustom = function(select)
+	{
+		var row = $(select).parents(self.selectors.row);
+		var field = $(row).find('.disable-billing-field-custom');
+		if ( $(select).val() === 'custom' ){
+			$(field).show();
+			return;
+		}
+		$(field).hide();
 	}
 
 	return self.bindEvents();

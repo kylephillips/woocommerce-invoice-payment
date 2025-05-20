@@ -89,35 +89,13 @@ class PaymentMethod extends \WC_Payment_Gateway
                 'class' => 'invoice-payment-repeater',
                 'desc_tip'    => false
             ],
-			'disable_name_fields' => [
-                'title'       => __( 'Disable Name Fields', WOOINVOICEPAYMENT_DOMAIN ),
-                'label'       => __( 'Disable the first and last name fields when invoice payment is selected.', WOOINVOICEPAYMENT_DOMAIN ),
-                'type'        => 'checkbox',
-                'default'     => 'no'
-            ],
-            'first_name_field' => [
-                'title'       => __( 'First Name Custom Field Meta Key', WOOINVOICEPAYMENT_DOMAIN ),
-                'description'       => __( 'If terms is selected, and name fields are disabled, enter a custom field to pull the value from. Leave blank to use the stored WordPress user value. If the custom user meta is unavailable, the WordPress value will be used. If neither are available, the field will not be disabled.', WOOINVOICEPAYMENT_DOMAIN ),
-                'type'        => 'text',
-                'class'	=> 'disable-name-fields'
-            ],
-            'last_name_field' => [
-                'title'       => __( 'Last Name Custom Field Meta Key', WOOINVOICEPAYMENT_DOMAIN ),
-                'description'       => __( 'If terms is selected, and name fields are disabled, enter a custom field to pull the value from. Leave blank to use the stored WordPress user value. If the custom user meta is unavailable, the WordPress value will be used. If neither are available, the field will not be disabled.', WOOINVOICEPAYMENT_DOMAIN ),
-                'type'        => 'text',
-                'class'	=> 'disable-name-fields'
-            ],
-            'disable_email_field' => [
-                'title'       => __( 'Disable Email Field', WOOINVOICEPAYMENT_DOMAIN ),
-                'label'       => __( 'Disable the email field when invoice payment is selected.', WOOINVOICEPAYMENT_DOMAIN ),
-                'type'        => 'checkbox',
-                'default'     => 'no'
-            ],
-            'email_field' => [
-                'title'       => __( 'Email Custom Field Meta Key', WOOINVOICEPAYMENT_DOMAIN ),
-                'description'       => __( 'If terms is selected, and email is disabled, enter a custom field to pull the value from. Leave blank to use the stored WordPress user value. If the custom user meta is unavailable, the WordPress value will be used. If neither are available, the field will not be disabled.', WOOINVOICEPAYMENT_DOMAIN ),
-                'type'        => 'text',
-                'class'	=> 'disable-email-field'
+            'disable_billing_fields' => [
+                'title'       => __( 'Hide and/or Disable Billing Fields', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'repeater_disable_billing_fields',
+                'default'     => 'none',
+                'description' => __( 'Hide and/or Disable billing fields if the invoice payment method is selected.', WOOINVOICEPAYMENT_DOMAIN ),
+                'class' => 'invoice-payment-repeater',
+                'desc_tip'    => false
             ],
 			'hide_billing_checkout' => [
                 'title'       => __( 'Hide Billing at Checkout', WOOINVOICEPAYMENT_DOMAIN ),
@@ -260,6 +238,21 @@ class PaymentMethod extends \WC_Payment_Gateway
 		}
 		return true;
 	}
+
+	/**
+    * Validate the disable billing fields
+    */
+    public function validate_repeater_disable_billing_fields_field($field_key, $data)
+    {
+        if ( !$data ) return;
+        foreach ( $data as $key => $option ) :
+        	if ( $data[$key]['name'] == '' ) continue;
+        	$data[$key]['name'] = sanitize_text_field($data[$key]['name']);
+        	$data[$key]['custom'] = ( isset($data[$key]['custom']) && $data[$key]['custom'] !== '' ) 
+        		? sanitize_text_field($data[$key]['custom']) : null;
+        endforeach;
+        return $data;
+    }
 
 	/**
     * Validate the billing meta overrides

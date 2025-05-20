@@ -22,7 +22,7 @@ class Bootstrap
 	{
 		$plugin_directory = plugins_url() . '/' . basename(dirname(dirname(__FILE__)));
 		define('WOOINVOICEPAYMENT_PLUGIN_DIRECTORY', $plugin_directory);
-		define('WOOINVOICEPAYMENT_VERSION', '1.0.7');
+		define('WOOINVOICEPAYMENT_VERSION', '1.0.8');
 		define('WOOINVOICEPAYMENT_DOMAIN', 'woocommerce-invoice-payment'); // Localization domain
 	}
 
@@ -57,8 +57,8 @@ class Bootstrap
 		new Events\PublicEvents;
 		new Fields\ShippingRepeater;
 		new Fields\OverrideBillingFieldsRepeater;
+		new Fields\DisableBillingFieldsRepeater;
 		new OrderTotals\OrderTotals;
-		new UserMeta\CheckoutValues;
 	}
 
 	/**

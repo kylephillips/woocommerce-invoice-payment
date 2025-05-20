@@ -5,6 +5,7 @@ use WooInvoicePayment\Repositories\UserRepository;
 use WooInvoicePayment\Repositories\SettingsRepository;
 use WooInvoicePayment\Repositories\ShippingRepository;
 use WooInvoicePayment\Repositories\OverrideFieldRepository;
+use WooInvoicePayment\Repositories\DisableBillingFieldsRepository;
 
 /**
 * Load our front-end dependencies and localize
@@ -30,6 +31,12 @@ class Dependencies
 	private $override_fields_repo;
 
 	/**
+	* Disable Billing Fields Repository
+	* @var obj DisableBillingFieldsRepository
+	*/ 
+	private $disable_billing_fields_repo;
+
+	/**
 	* Setting Repository
 	* @var obj SettingsRepository
 	*/ 
@@ -40,6 +47,7 @@ class Dependencies
 		$this->user_repo = new UserRepository;
 		$this->shipping_repo = new ShippingRepository;
 		$this->override_fields_repo = new OverrideFieldRepository;
+		$this->disable_billing_fields_repo = new DisableBillingFieldsRepository;
 		$this->settings = new SettingsRepository;
 		add_action('wp_enqueue_scripts', [$this, 'scripts']);
 		add_action('wp_enqueue_scripts', [$this, 'styles']);
@@ -100,7 +108,8 @@ class Dependencies
 		);
 		$localized_data = [
 			'shipping_options_fields' => $this->shipping_repo->outputFields(),
-			'override_billing_fields' => $this->override_fields_repo->outputFields()
+			'override_billing_fields' => $this->override_fields_repo->outputFields(),
+			'disable_billing_fields' => $this->disable_billing_fields_repo->outputFields()
 		];
 		wp_localize_script(
 			'woocommerce-invoice-payment',

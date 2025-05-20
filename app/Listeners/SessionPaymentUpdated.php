@@ -23,6 +23,7 @@ class SessionPaymentUpdated
 	private $settings; 
 	private $fields_required;
 	private $values;
+	private $overrides;
 
 	public function __construct()
 	{
@@ -30,6 +31,7 @@ class SessionPaymentUpdated
 		$this->settings = new SettingsRepository;
 		$this->fields_required = new FieldsRequired;
 		$this->values = new Values;
+		$this->overrides = $this->settings->billingMetaOverrides();
 		$this->validate();
 		$this->savePaymentMethod();
 	}
@@ -62,9 +64,8 @@ class SessionPaymentUpdated
 			: $this->fields_required->getBillingFields(false);
 		
 		$shipping_fields = false;
-		if ( class_exists('\WooLocalPickupExpanded\ShippingMethod\FieldsRequired') ) :
+		if ( class_exists('\WooLocalPickupExpanded\ShippingMethod\FieldsRequired') ) 
 			$shipping_fields = ( new \WooLocalPickupExpanded\ShippingMethod\FieldsRequired )->getShippingFields();
-		endif;
 		
 		WC()->session->set('chosen_payment_method', $payment_method);
 		$data['hide_billing'] = ( $this->user_repo->customerAllowed() && $this->settings->hideBillingInCheckout() && $payment_method == 'invoice' ) ? true : false;
@@ -92,11 +93,15 @@ class SessionPaymentUpdated
 	*/
 	private function setCustomBillingFields($payment_method)
 	{
-		$fields = ['email', 'first_name', 'last_name'];
 		$customer_details = [];
-		foreach ( $fields as $field ) :
-			$customer_details[$field] = ( $payment_method == 'invoice' ) ? $this->values->getValue($field) : $this->values->getDefaultValue($field);
-			WC()->session->set('billing_' . $field, $customer_details[$field]);
+		foreach ( $this->overrides as $field ) :
+			$meta_key = $field['custom'];
+			if ( !$meta_key ) $meta_key = $field['name'];
+			$value = get_user_meta(get_current_user_id(), $meta_key, true);
+			if ( !$value ) $value = $this->values->getDefaultValue($meta_key);
+			$name = ( $field['name'] == 'custom' ) ? $field['custom'] : $field['name'];
+			$customer_details[$name] = ( $payment_method == 'invoice' ) ? $value : $this->values->getDefaultValue($meta_key);
+			WC()->session->set($meta_key, $customer_details[$name]);
 		endforeach;
 		return $customer_details;
 	}
@@ -106,15 +111,10 @@ class SessionPaymentUpdated
 	*/
 	private function setForcedCustomFields($payment_method)
 	{
-		$fields = [
-			'email' => false,
-			'first_name' => false,
-			'last_name' => false
-		];
 		if ( $payment_method !== 'invoice' ) return $fields;
-		foreach ( $fields as $key => $value ) :
-			$force = $this->values->forceCustomValue($key, $payment_method);
-			$fields[$key] = $force;
+		$fields = [];
+		foreach ( $this->overrides as $field ) :
+			$fields[$field['name']] = ( $field['disable'] ) ? true : false;
 		endforeach;
 		return $fields;
 	}

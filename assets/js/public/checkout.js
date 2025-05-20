@@ -24,12 +24,6 @@ WooInvoicePayment.Checkout = function()
 				self.updateSessionPaymentMethod();
 			}, 50);
 		});
-		$(document.body).on('payment_method_selected', function(){
-			self.toggleBillingTerms();
-			setTimeout(function(){
-				self.updateSessionPaymentMethod();
-			}, 50);
-		});
 		$(document.body).on('updated_checkout', function(){
 			self.toggleLocalPickup();
 			self.toggleTaxSubtotal();
@@ -131,12 +125,11 @@ WooInvoicePayment.Checkout = function()
 				var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
 				var billing_fields = ( d.data.new_payment_method === 'invoice' ) ? '' : d.data.billing_fields;
 				self.populateBillingFields(d.data.billing_fields);
-				self.overrideBillingDetails(d.data.customer_details, d.data.customer_fields_custom_force);
 				self.populateShippingFields(d.data.shipping_fields);
 				self.toggleBillingFields(d.data.hide_billing);
 				setTimeout(function(){
+					if ( d.data.new_payment_method === 'invoice' ) self.overrideBillingDetails(d.data.customer_details, d.data.customer_fields_custom_force);
 					$(document.body).trigger('country_to_state_changed'); // Reset SelectWoo
-					$(document.body).trigger('update_checkout');
 				}, 500);
 			},
 			error: function(d){
@@ -161,16 +154,14 @@ WooInvoicePayment.Checkout = function()
 	self.overrideBillingDetails = function(fields, override)
 	{
 		for ( const property in override ){
-			var key = 'billing_' + property;
 			if ( override[property] ){
-				$('#' + key).attr('disabled', true);
+				$('#' + property).attr('readonly', true);
 			} else {
-				$('#' + key).removeAttr('disabled');
+				$('#' + property).removeAttr('readonly');
 			}
 		}
 		for ( const property in fields ){
-			var key = 'billing_' + property;
-			if ( fields[property] ) $('#' + key).val(fields[property]);
+			if ( fields[property] ) $('#' + property).val(fields[property]);
 		}
 	}
 
@@ -189,17 +180,14 @@ WooInvoicePayment.Checkout = function()
 	*/
 	self.toggleBillingFields = function(hide)
 	{
-		var billingFields = $('.woocommerce-billing-fields').find('.form-row, .address-book-selection').not('#billing_first_name_field').not('#billing_last_name_field').not('#billing_email_field').not('#billing_company_field');
 		var shipToDifferent = $('#ship-to-different-address');
 		if ( hide ){
 			$('.woocommerce-checkout').addClass('billing-fields-hidden');
-			$(billingFields).hide();
 			$(shipToDifferent).hide();
 			$(document).trigger('woocommerce-invoice-payment-billing-fields-toggled', [hide]);
 			return;
 		}
 		$('.woocommerce-checkout').removeClass('billing-fields-hidden');
-		$(billingFields).show();
 		$(shipToDifferent).show();
 		$(document).trigger('woocommerce-invoice-payment-billing-fields-toggled', [hide]);
 	}

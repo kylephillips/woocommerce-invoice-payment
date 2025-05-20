@@ -3,6 +3,7 @@ namespace WooInvoicePayment\PaymentMethod;
 
 use WooInvoicePayment\UserMeta\Values;
 use WooInvoicePayment\Repositories\SettingsRepository;
+use WooInvoicePayment\Repositories\BillingFieldsRepository;
 
 /**
 * Remove billing fields if the invoice payment method is selected
@@ -21,10 +22,17 @@ class FieldsRequired
 	*/
 	private $values;
 
+	/**
+	* Billing Fields Repository
+	* @var obj
+	*/
+	private $billing_fields_repo;
+
 	public function __construct()
 	{
 		$this->settings = new SettingsRepository;
 		$this->values = new Values;
+		$this->billing_fields_repo = new BillingFieldsRepository;
 		add_filter('woocommerce_billing_fields' , [$this, 'removeRequiredBilling']);
 		add_filter('woocommerce_checkout_fields' , [$this, 'removeRequiredBilling']);
 	}
@@ -37,10 +45,9 @@ class FieldsRequired
 		if ( !is_checkout() || !$this->settings->hideBillingInCheckout() ) return $fields;
 		$payment_method = WC()->session->get('chosen_payment_method');
 		if ( $payment_method !== 'invoice' ) return $fields;
-		$include = ['billing', 'billing_first_name', 'billing_last_name', 'billing_email', 'billing_country'];
+		$hidden_fields = $this->billing_fields_repo->getHiddenFields();
 		foreach ( $fields as $name => $field ){
-			if ( in_array($name, $include) ) continue; 
-			if ( str_contains($name, 'billing_') ) unset($fields[$name]);
+			if ( in_array($name, $hidden_fields) ) unset($fields[$name]); 
 		}
 		return $fields;
 	}
@@ -80,12 +87,12 @@ class FieldsRequired
 	*/
 	public function getInvoiceBillingFields()
 	{
+		$hidden_fields = $this->billing_fields_repo->getHiddenFields();
 		$checkout = new \WC_Checkout;
 		$fields = $checkout->get_checkout_fields('billing');
-		$include = ['billing', 'billing_first_name', 'billing_last_name', 'billing_email', 'billing_country', 'billing_company'];
 		$fields_html = '';
 		foreach ( $fields as $key => $field ) {
-			if ( !in_array($key, $include) ) continue;
+			if ( in_array($key, $hidden_fields) ) continue;
 			$value = ( $key == 'billing_country' ) ? 'US' : $checkout->get_value( $key );
 			$field['return'] = true;
 			$fields_html .= woocommerce_form_field( $key, $field, $value );
