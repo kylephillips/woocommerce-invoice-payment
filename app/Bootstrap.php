@@ -56,7 +56,9 @@ class Bootstrap
 		new Activation\Dependencies;
 		new Events\PublicEvents;
 		new Fields\ShippingRepeater;
+		new Fields\OverrideBillingFieldsRepeater;
 		new OrderTotals\OrderTotals;
+		new UserMeta\CheckoutValues;
 	}
 
 	/**

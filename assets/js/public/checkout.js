@@ -131,6 +131,7 @@ WooInvoicePayment.Checkout = function()
 				var payment_method = $(self.selectors.paymentMethodRadio + ':checked').val();
 				var billing_fields = ( d.data.new_payment_method === 'invoice' ) ? '' : d.data.billing_fields;
 				self.populateBillingFields(d.data.billing_fields);
+				self.overrideBillingDetails(d.data.customer_details, d.data.customer_fields_custom_force);
 				self.populateShippingFields(d.data.shipping_fields);
 				self.toggleBillingFields(d.data.hide_billing);
 				setTimeout(function(){
@@ -155,6 +156,25 @@ WooInvoicePayment.Checkout = function()
 	}
 
 	/**
+	* Override billing detail values and set to disabled if applicable
+	*/
+	self.overrideBillingDetails = function(fields, override)
+	{
+		for ( const property in override ){
+			var key = 'billing_' + property;
+			if ( override[property] ){
+				$('#' + key).attr('disabled', true);
+			} else {
+				$('#' + key).removeAttr('disabled');
+			}
+		}
+		for ( const property in fields ){
+			var key = 'billing_' + property;
+			if ( fields[property] ) $('#' + key).val(fields[property]);
+		}
+	}
+
+	/**
 	* Populate shipping fields if applicable 
 	* For compatibility with local pickup expanded
 	*/
@@ -169,7 +189,7 @@ WooInvoicePayment.Checkout = function()
 	*/
 	self.toggleBillingFields = function(hide)
 	{
-		var billingFields = $('.woocommerce-billing-fields').find('.form-row, .address-book-selection').not('#billing_first_name_field').not('#billing_last_name_field').not('#billing_email_field');
+		var billingFields = $('.woocommerce-billing-fields').find('.form-row, .address-book-selection').not('#billing_first_name_field').not('#billing_last_name_field').not('#billing_email_field').not('#billing_company_field');
 		var shipToDifferent = $('#ship-to-different-address');
 		if ( hide ){
 			$('.woocommerce-checkout').addClass('billing-fields-hidden');

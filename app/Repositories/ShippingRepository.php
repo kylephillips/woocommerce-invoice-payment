@@ -5,11 +5,12 @@ class ShippingRepository
 {
 	public function outputSettings($options = [])
 	{
-		if ( empty($options) || $options[0] == 'none') return;
 		$out = '<div class="woocommerce-invoice-payment-repeater">';
+		if ( !empty($options) || $options[0] !== 'none') :
 		foreach ( $options as $key => $option ) :
 			$out .= $this->outputFields($option, $key);
 		endforeach;
+		endif;
 		$out .= '</div>';
 		return $out;
 	}

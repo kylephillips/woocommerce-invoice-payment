@@ -1,6 +1,7 @@
 <?php
 namespace WooInvoicePayment\PaymentMethod;
 
+use WooInvoicePayment\UserMeta\Values;
 use WooInvoicePayment\Repositories\SettingsRepository;
 
 /**
@@ -14,9 +15,16 @@ class FieldsRequired
 	*/
 	private $settings;
 
+	/**
+	* User Meta Values Repository
+	* @var obj
+	*/
+	private $values;
+
 	public function __construct()
 	{
 		$this->settings = new SettingsRepository;
+		$this->values = new Values;
 		add_filter('woocommerce_billing_fields' , [$this, 'removeRequiredBilling']);
 		add_filter('woocommerce_checkout_fields' , [$this, 'removeRequiredBilling']);
 	}
@@ -50,8 +58,16 @@ class FieldsRequired
 		$fields = $checkout->get_checkout_fields('billing');
 		$fields_html = '';
 		foreach ( $fields as $key => $field ) {
+
+			// Optional override
+			$value = false;
+			if ( $key == 'billing_first_name' ) $value = $this->values->getValue('first_name');
+			if ( $key == 'billing_last_name' ) $value = $this->values->getValue('last_name');
+			if ( $key == 'billing_email' ) $value = $this->values->getValue('email');
+			$value = ( $value ) ? $value : $checkout->get_value($key);
+
 			$field['return'] = true;
-			$fields_html .= woocommerce_form_field( $key, $field, $checkout->get_value( $key ) );
+			$fields_html .= woocommerce_form_field( $key, $field, $value );
 		}
 
 		add_filter('woocommerce_billing_fields' , [$this, 'removeRequiredBilling']);
@@ -66,7 +82,7 @@ class FieldsRequired
 	{
 		$checkout = new \WC_Checkout;
 		$fields = $checkout->get_checkout_fields('billing');
-		$include = ['billing', 'billing_first_name', 'billing_last_name', 'billing_email', 'billing_country'];
+		$include = ['billing', 'billing_first_name', 'billing_last_name', 'billing_email', 'billing_country', 'billing_company'];
 		$fields_html = '';
 		foreach ( $fields as $key => $field ) {
 			if ( !in_array($key, $include) ) continue;

@@ -106,4 +106,35 @@ class SettingsRepository
 		$option = get_option('woocommerce_invoice_settings');
 		return ( isset($option['shipping_options']) ) ? $option['shipping_options'] : false;
 	}
+
+	/**
+	* Should name fields be disabled/prepopulated if invoice method is selected?
+	* @return bool
+	*/
+	public function disableNameFields()
+	{
+		$option = get_option('woocommerce_invoice_settings');
+		return ( isset($option['disable_name_fields']) && $option['disable_name_fields'] == 'yes' ) ? true : false;
+	}
+
+	/**
+	* Should the email field be disabled/prepopulated if invoice method is selected?
+	* @return bool
+	*/
+	public function disableEmailField()
+	{
+		$option = get_option('woocommerce_invoice_settings');
+		return ( isset($option['disable_email_field']) && $option['disable_email_field'] == 'yes' ) ? true : false;
+	}
+
+	/**
+	* Get the user meta key that should populate/override a field
+	* @return bool
+	*/
+	public function userMetaKey($field = 'first_name')
+	{
+		$option = get_option('woocommerce_invoice_settings');
+		$key = $field . '_field';
+		return ( isset($option[$key]) && $option[$key] !== '' ) ? $option[$key] : false;
+	}
 }

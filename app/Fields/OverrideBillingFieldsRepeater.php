@@ -1,19 +1,19 @@
 <?php
 namespace WooInvoicePayment\Fields;
 
-use WooInvoicePayment\Repositories\ShippingRepository;
+use WooInvoicePayment\Repositories\OverrideFieldRepository;
 
 /**
 * Define our custom Woo settings field type to save multiple locations
 */
-class ShippingRepeater
+class OverrideBillingFieldsRepeater
 {
 	private $repo;
 
 	public function __construct()
 	{
-		$this->repo = new ShippingRepository;
-		add_filter( 'woocommerce_generate_repeater_shipping_options_html', [$this, 'field'], 10, 4 );
+		$this->repo = new OverrideFieldRepository;
+		add_filter( 'woocommerce_generate_repeater_override_billing_meta_html', [$this, 'field'], 10, 4 );
 	}
 
 	public function field($output, $key, $data, $method)
@@ -25,7 +25,7 @@ class ShippingRepeater
 			'class'             => '',
 			'css'               => '',
 			'placeholder'       => '',
-			'type'              => 'repeater_shipping_options',
+			'type'              => 'repeater_override_billing_meta',
 			'desc_tip'          => false,
 			'description'       => '',
 			'custom_attributes' => [],
@@ -47,8 +47,8 @@ class ShippingRepeater
 				<div class="woocommerce-invoice-payment-repeater-wrapper">
 					<?php echo $this->repo->outputSettings($value); ?>
 				</div>
-				<a href="#" data-woocommerce-invoice-payment-repeater-add-new="shipping_option" class="button">
-					<?php _e('Add New Shipping Option', WOOINVOICEPAYMENT_DOMAIN); ?>
+				<a href="#" data-woocommerce-invoice-payment-repeater-add-new="override_billing_fields" class="button">
+					<?php _e('Add Field', WOOINVOICEPAYMENT_DOMAIN); ?>
 				</a>
 			</td>
 		</tr>

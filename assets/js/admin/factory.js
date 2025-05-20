@@ -15,7 +15,7 @@ WooInvoicePaymentAdmin.Factory = function()
 	self.build = function()
 	{
 		new WooInvoicePaymentAdmin.Settings;
-		new WooInvoicePaymentAdmin.ShippingOptionsField;
+		new WooInvoicePaymentAdmin.RepeaterField;
 		self.initializeSelectWoo();
 	};
 

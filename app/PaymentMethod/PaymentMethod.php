@@ -81,6 +81,44 @@ class PaymentMethod extends \WC_Payment_Gateway
 				'default'     => '',
 				'desc_tip'    => true,
 			],
+			'override_billing_meta' => [
+                'title'       => __( 'Override Billing Fields', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'repeater_override_billing_meta',
+                'default'     => 'none',
+                'description' => __( 'Override billing fields with custom user meta and disable editing if invoice payment is selected.', WOOINVOICEPAYMENT_DOMAIN ),
+                'class' => 'invoice-payment-repeater',
+                'desc_tip'    => false
+            ],
+			'disable_name_fields' => [
+                'title'       => __( 'Disable Name Fields', WOOINVOICEPAYMENT_DOMAIN ),
+                'label'       => __( 'Disable the first and last name fields when invoice payment is selected.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'checkbox',
+                'default'     => 'no'
+            ],
+            'first_name_field' => [
+                'title'       => __( 'First Name Custom Field Meta Key', WOOINVOICEPAYMENT_DOMAIN ),
+                'description'       => __( 'If terms is selected, and name fields are disabled, enter a custom field to pull the value from. Leave blank to use the stored WordPress user value. If the custom user meta is unavailable, the WordPress value will be used. If neither are available, the field will not be disabled.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'text',
+                'class'	=> 'disable-name-fields'
+            ],
+            'last_name_field' => [
+                'title'       => __( 'Last Name Custom Field Meta Key', WOOINVOICEPAYMENT_DOMAIN ),
+                'description'       => __( 'If terms is selected, and name fields are disabled, enter a custom field to pull the value from. Leave blank to use the stored WordPress user value. If the custom user meta is unavailable, the WordPress value will be used. If neither are available, the field will not be disabled.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'text',
+                'class'	=> 'disable-name-fields'
+            ],
+            'disable_email_field' => [
+                'title'       => __( 'Disable Email Field', WOOINVOICEPAYMENT_DOMAIN ),
+                'label'       => __( 'Disable the email field when invoice payment is selected.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'checkbox',
+                'default'     => 'no'
+            ],
+            'email_field' => [
+                'title'       => __( 'Email Custom Field Meta Key', WOOINVOICEPAYMENT_DOMAIN ),
+                'description'       => __( 'If terms is selected, and email is disabled, enter a custom field to pull the value from. Leave blank to use the stored WordPress user value. If the custom user meta is unavailable, the WordPress value will be used. If neither are available, the field will not be disabled.', WOOINVOICEPAYMENT_DOMAIN ),
+                'type'        => 'text',
+                'class'	=> 'disable-email-field'
+            ],
 			'hide_billing_checkout' => [
                 'title'       => __( 'Hide Billing at Checkout', WOOINVOICEPAYMENT_DOMAIN ),
                 'label'       => __( 'Hide the billing address at checkout and remove requirement.', WOOINVOICEPAYMENT_DOMAIN ),
@@ -222,6 +260,22 @@ class PaymentMethod extends \WC_Payment_Gateway
 		}
 		return true;
 	}
+
+	/**
+    * Validate the billing meta overrides
+    */
+    public function validate_repeater_override_billing_meta_field($field_key, $data)
+    {
+        if ( !$data ) return;
+        foreach ( $data as $key => $option ) :
+        	if ( $data[$key]['name'] == '' ) continue;
+        	$data[$key]['name'] = sanitize_text_field($data[$key]['name']);
+        	$data[$key]['custom'] = ( isset($data[$key]['custom']) && $data[$key]['custom'] !== '' ) 
+        		? sanitize_text_field($data[$key]['custom']) : null;
+        	$data[$key]['disable'] = ( isset($data[$key]['disable']) && $data[$key]['disable'] == 'yes' ) ? 'yes' : null;
+        endforeach;
+        return $data;
+    }
 
 	/**
     * Validate the locations
